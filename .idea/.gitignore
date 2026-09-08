@@ -1,3 +1,11 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Env files (if you ever add one)
+.env
+.env.local
