@@ -15,13 +15,17 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 RUN addgroup -S spring && adduser -S spring -G spring
+
+# Create the uploads directory and hand ownership to the spring user
+# BEFORE switching to that user — this is the fix
+RUN mkdir -p /app/uploads && chown -R spring:spring /app/uploads
+
 USER spring:spring
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --chown=spring:spring --from=build /app/target/*.jar app.jar
 
 VOLUME /app/uploads
 
-# Render assigns the port dynamically via $PORT — default 8080 only matters for local `docker run`
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
