@@ -40,4 +40,7 @@ public class MenuItem {
 
     @Column(name = "photo_url", length=300)
     private String photoUrl;
+
+    @Column(name = "photo_public_id", length = 200)
+    private String photoPublicId;   // Cloudinary's ID for this image, needed if we ever delete it later
 }

@@ -25,4 +25,7 @@ public class ShopImage {
     @Column(name = "uploaded_at", nullable = false)
     @Builder.Default
     private LocalDateTime uploadedAt = LocalDateTime.now();
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;   // full Cloudinary secure_url — served directly, no local path needed
 }

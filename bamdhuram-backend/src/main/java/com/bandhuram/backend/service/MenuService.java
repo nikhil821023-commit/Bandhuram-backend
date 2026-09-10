@@ -7,6 +7,8 @@ import com.bandhuram.backend.exception.BadFileException;
 import com.bandhuram.backend.exception.ResourceNotFoundException;
 import com.bandhuram.backend.repository.MenuCategoryRepository;
 import com.bandhuram.backend.repository.MenuItemRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +31,7 @@ public class MenuService {
 
     private final MenuCategoryRepository categoryRepository;
     private final MenuItemRepository itemRepository;
+    private final Cloudinary cloudinary;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -136,24 +140,21 @@ public class MenuService {
         }
 
         try {
-            Path dir = Paths.get(uploadDir, "menu-items");
-            Files.createDirectories(dir);
-
-            String ext = switch (file.getContentType()) {
-                case "image/png" -> ".png";
-                case "image/webp" -> ".webp";
-                default -> ".jpg";
-            };
-            String storedName = UUID.randomUUID() + ext;
-            Files.copy(file.getInputStream(), dir.resolve(storedName), StandardCopyOption.REPLACE_EXISTING);
-
-            item.setPhotoUrl("/images/menu-items/" + storedName);
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "folder", "bandhuram/menu-items",
+                    "resource_type", "image"
+            ));
+            item.setPhotoUrl((String) result.get("secure_url"));
+            item.setPhotoPublicId((String) result.get("public_id"));
             return toDto(item);
 
         } catch (IOException e) {
-            throw new BadFileException("Could not save the uploaded image.");
+            throw new BadFileException("Could not upload the image.");
         }
     }
+
+
+
 
     @Transactional
     public void deleteItem(Long id) {
@@ -162,4 +163,6 @@ public class MenuService {
         }
         itemRepository.deleteById(id);
     }
+
+
 }

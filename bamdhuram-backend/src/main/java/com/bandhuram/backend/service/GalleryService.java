@@ -5,17 +5,17 @@ import com.bandhuram.backend.entity.ShopImage;
 import com.bandhuram.backend.exception.BadFileException;
 import com.bandhuram.backend.exception.ResourceNotFoundException;
 import com.bandhuram.backend.repository.ShopImageRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +24,7 @@ public class GalleryService {
     private static final Set<String> ALLOWED_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
 
     private final ShopImageRepository shopImageRepository;
-
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
 
     @Transactional
     public ShopImageResponse upload(MultipartFile file, String caption, Integer sortOrder) {
@@ -38,21 +36,17 @@ public class GalleryService {
         }
 
         try {
-            Path dir = Paths.get(uploadDir);
-            Files.createDirectories(dir);
-
-            String extension = switch (file.getContentType()) {
-                case "image/png" -> ".png";
-                case "image/webp" -> ".webp";
-                default -> ".jpg";
-            };
-            String storedName = UUID.randomUUID() + extension;
-            Path target = dir.resolve(storedName);
-            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "folder", "bandhuram/shop",
+                    "resource_type", "image"
+            ));
+            String publicId = (String) result.get("public_id");
+            String secureUrl = (String) result.get("secure_url");
 
             ShopImage saved = shopImageRepository.save(
                     ShopImage.builder()
-                            .fileName(storedName)
+                            .fileName(publicId)
+                            .imageUrl(secureUrl)
                             .caption(caption)
                             .sortOrder(sortOrder)
                             .build()
@@ -60,7 +54,7 @@ public class GalleryService {
             return toDto(saved);
 
         } catch (IOException e) {
-            throw new BadFileException("Could not save the uploaded image.");
+            throw new BadFileException("Could not upload the image.");
         }
     }
 
@@ -76,9 +70,9 @@ public class GalleryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found: " + id));
 
         try {
-            Files.deleteIfExists(Paths.get(uploadDir).resolve(image.getFileName()));
+            cloudinary.uploader().destroy(image.getFileName(), ObjectUtils.emptyMap());
         } catch (IOException ignored) {
-            // if the file's already gone, still remove the DB row
+            // if it's already gone on Cloudinary's side, still remove the DB row
         }
         shopImageRepository.delete(image);
     }
@@ -86,7 +80,7 @@ public class GalleryService {
     private ShopImageResponse toDto(ShopImage image) {
         return new ShopImageResponse(
                 image.getId(),
-                "/images/shop/" + image.getFileName(),
+                image.getImageUrl(),
                 image.getCaption(),
                 image.getSortOrder(),
                 image.getUploadedAt()
