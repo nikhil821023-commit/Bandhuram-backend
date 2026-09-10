@@ -10,7 +10,6 @@ import com.bandhuram.backend.repository.MenuItemRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,8 +32,6 @@ public class MenuService {
     private final MenuItemRepository itemRepository;
     private final Cloudinary cloudinary;
 
-    @Value("${app.upload.dir}")
-    private String uploadDir;
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDto> getFullMenu() {
