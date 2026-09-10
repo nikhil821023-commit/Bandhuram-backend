@@ -70,7 +70,17 @@ public class OrderService {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(i -> new OrderItemResponse(i.getMenuItemId(), i.getItemName(), i.getPriceLabel(), i.getQuantity()))
                 .toList();
-        return new OrderResponse(order.getId(), order.getCustomerName(), order.getPhone(),
-                order.getNotes(), order.getStatus(), order.getCreatedAt(), items);
+
+        return new OrderResponse(
+                order.getId(),
+                order.getCustomerName(),
+                order.getPhone(),
+                order.getNotes(),
+                order.getStatus(),
+                order.getCreatedAt(),   // Instant — 6th position
+                items                   // List<OrderItemResponse> — 7th position
+        );
     }
+
+
 }
