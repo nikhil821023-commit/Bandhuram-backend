@@ -13,13 +13,17 @@ spring:
         format_sql: true
 
 
-servlet:
-  multipart:
+  servlet:
+   multipart:
     max-file-size: 10MB
     max-request-size: 10MB
 
 server:
   port: ${PORT:8080}
+
+jackson:
+  time-zone: UTC
+
 
 app:
   jwt:

@@ -2,6 +2,8 @@ package com.bandhuram.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,10 +24,12 @@ public class ShopImage {
     @Column(name = "sort_order")
     private Integer sortOrder;
 
-    @Column(name = "uploaded_at", nullable = false)
-    @Builder.Default
-    private LocalDateTime uploadedAt = LocalDateTime.now();
+
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;   // full Cloudinary secure_url — served directly, no local path needed
+
+    @Column(name = "uploaded_at", nullable = false)
+    @Builder.Default
+    private Instant uploadedAt = Instant.now();
 }

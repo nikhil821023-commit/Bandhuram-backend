@@ -1,6 +1,8 @@
 package com.bandhuram.backend.dto;
 
 import com.bandhuram.backend.entity.InquiryStatus;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public record ContactResponse(
@@ -10,5 +12,5 @@ public record ContactResponse(
         String email,
         String message,
         InquiryStatus status,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {}

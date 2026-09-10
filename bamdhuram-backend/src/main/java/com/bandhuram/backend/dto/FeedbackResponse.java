@@ -1,5 +1,6 @@
 package com.bandhuram.backend.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public record FeedbackResponse(
@@ -7,5 +8,5 @@ public record FeedbackResponse(
         String name,
         int rating,
         String comment,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {}

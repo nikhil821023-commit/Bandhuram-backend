@@ -2,6 +2,8 @@ package com.bandhuram.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,15 @@ public class Order {
     @Builder.Default
     private OrderStatus status = OrderStatus.NEW;
 
-    @Column(name = "created_at", nullable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
+
+
+
+    @Column(name = "created_at", nullable = false)
+    @Builder.Default
+    private Instant createdAt = Instant.now();
 }

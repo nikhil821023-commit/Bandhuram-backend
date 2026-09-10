@@ -2,6 +2,8 @@ package com.bandhuram.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,7 +24,9 @@ public class Feedback {
     @Column(nullable = false, length = 500)
     private String comment;
 
+
+
     @Column(name = "created_at", nullable = false)
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

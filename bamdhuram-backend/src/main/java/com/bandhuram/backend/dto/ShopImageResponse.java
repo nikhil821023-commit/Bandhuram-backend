@@ -1,5 +1,6 @@
 package com.bandhuram.backend.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public record ShopImageResponse(
@@ -7,5 +8,5 @@ public record ShopImageResponse(
         String url,
         String caption,
         Integer sortOrder,
-        LocalDateTime uploadedAt
+        Instant createdAt
 ) {}
