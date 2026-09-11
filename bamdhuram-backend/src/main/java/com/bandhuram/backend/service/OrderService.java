@@ -82,5 +82,13 @@ public class OrderService {
         );
     }
 
+    @Transactional
+    public void deleteOrder(Long id) {
+        if (!orderRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Order not found: " + id);
+        }
+        orderRepository.deleteById(id);
+    }
+
 
 }
